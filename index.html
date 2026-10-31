@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lapor Gangguan Komputer</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 480px; margin: 40px auto; padding: 0 16px; }
+    input, textarea { width: 100%; padding: 8px; box-sizing: border-box; margin-bottom: 12px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    #hasil { margin-top: 16px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Lapor Gangguan Komputer</h1>
+
+  <form id="form">
+    <input id="nama" placeholder="Nama pelapor" required>
+    <textarea id="masalah" rows="4" placeholder="Jelaskan masalahnya" required></textarea>
+    <button type="submit">Kirim Laporan</button>
+  </form>
+
+  <p id="hasil"></p>
+
+  <script>
+    const API = "https://ll152a2xkk.execute-api.us-east-1.amazonaws.com/permintaan";
+
+    document.getElementById("form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const hasil = document.getElementById("hasil");
+      hasil.textContent = "Mengirim...";
+
+      try {
+        const res = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nama: document.getElementById("nama").value,
+            masalah: document.getElementById("masalah").value
+          })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          hasil.textContent = "Berhasil! Nomor tiket Anda: " + data.tiket;
+          document.getElementById("form").reset();
+        } else {
+          hasil.textContent = "Gagal: " + data.pesan;
+        }
+      } catch (err) {
+        hasil.textContent = "Tidak dapat terhubung ke server";
+      }
+    });
+  </script>
+</body>
+</html>
